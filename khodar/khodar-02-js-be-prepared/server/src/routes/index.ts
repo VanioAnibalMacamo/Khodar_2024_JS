@@ -1,7 +1,10 @@
 import fastify, { FastifyInstance } from "fastify";
 import { SubscriberController } from "../controllers/SubscriberController";
+import { request } from "http";
+import { AuthController } from "../controllers/authController";
 
 const subscriberController = new SubscriberController();
+const authController = new AuthController();
 
 export async function routes(fastify: FastifyInstance){
 
@@ -11,5 +14,7 @@ export async function routes(fastify: FastifyInstance){
     });
     
     fastify.post("/subscribers",(request, reply) => subscriberController.create(request, reply));
+
+    fastify.post("/auth/opt", (request, reply) => authController.authOtp(request, reply));
 }
 

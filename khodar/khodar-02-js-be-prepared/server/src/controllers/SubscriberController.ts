@@ -2,6 +2,7 @@ import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
 import { generate6DigitsNumber } from '../utils/utils';
 import { db } from "../database";
 import { z } from 'zod'
+import { redis } from "../database/redis";
 
 export class SubscriberController{
 
@@ -43,17 +44,14 @@ export class SubscriberController{
             }
         });
 
-        
-            
         //Gerar o OTP e enviar para ele
         //Enviar o OTP por SMS
         const otp = generate6DigitsNumber();
         console.log(otp)
-      
-      
+        await redis.set(`otp_${otp}`, phone, 60 * 3)
+          
         return reply.status(201).send({
-            subscriber: savedSubscriber,
-            otp
+            subscriber: savedSubscriber
         });
     }
 }
