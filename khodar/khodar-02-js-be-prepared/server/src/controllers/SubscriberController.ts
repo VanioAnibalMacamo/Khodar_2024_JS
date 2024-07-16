@@ -3,6 +3,7 @@ import { generate6DigitsNumber } from '../utils/utils';
 import { db } from "../database";
 import { z } from 'zod'
 import { redis } from "../database/redis";
+import { error } from "console";
 
 export class SubscriberController{
 
@@ -56,7 +57,47 @@ export class SubscriberController{
     }
 
     async update(request: FastifyRequest, reply: FastifyReply){
-        return reply.send();
+        console.log(request.headers.authorization);
+
+        const deviceID = z.string().parse(request.headers.authorization);
+        
+        const subscriberSchema = z.object({
+            provinceId : z.string().optional(),
+            districtId : z.string().optional()
+        })
+
+        const { provinceId, districtId} = subscriberSchema.parse(request.body);
+
+        const subscriber = await db.subscriber.findUnique({
+            where: {
+                deviceID: deviceID,
+                verified: true
+            }
+        });
+        
+        if(!subscriber) return reply.status(401).send({ error: 'Erro de autenticação' });
+
+        const district = await db.district.findUnique({ 
+            where: {
+                id: districtId,
+                provinceId
+            }
+        });
+
+        if(!district){
+            return reply.status(400).send({ error: 'Distrito não pertencente a provincia'})
+        }
+
+        const updatedSubscriber = await db.subscriber.update({
+            where: {
+                deviceID
+            },
+            data:{
+                provinceId,
+                districtId
+            }
+        })
+        return reply.send(updatedSubscriber);
 
     }
 }

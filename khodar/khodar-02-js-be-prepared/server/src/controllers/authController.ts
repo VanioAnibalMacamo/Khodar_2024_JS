@@ -69,4 +69,6 @@ export class AuthController{
 
         return reply.status(204).send();
     }
+
+    
 }
