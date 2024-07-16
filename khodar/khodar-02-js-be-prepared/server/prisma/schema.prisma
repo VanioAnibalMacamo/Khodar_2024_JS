@@ -48,5 +48,19 @@ model Subscriber {
   district    District  @relation(fields: [districtId], references: [id])
   province    Province  @relation(fields: [provinceId], references: [id])
 
+  notification Notification[]
+
   @@map("subscribers")
+}
+
+model Notification{
+ id           	String    @id @default(uuid())
+ subscriberId   String    @map("subscriber_id")
+ message        String    
+ createdAt      DateTime  @default(now()) @map("created_at")
+ updatedAt      DateTime  @updatedAt @map("updated_at")
+ subscriber     Subscriber @relation(fields: [subscriberId], references: [id])
+ 
+ @@map("notifications")
+
 }
