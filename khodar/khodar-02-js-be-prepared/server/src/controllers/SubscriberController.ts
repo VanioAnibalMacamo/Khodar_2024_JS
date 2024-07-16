@@ -54,4 +54,9 @@ export class SubscriberController{
             subscriber: savedSubscriber
         });
     }
+
+    async update(request: FastifyRequest, reply: FastifyReply){
+        return reply.send();
+
+    }
 }
